@@ -5,18 +5,21 @@ import {
   Settings, Wifi, WifiOff, Zap, X
 } from "lucide-react";
 import "./styles.css";
+import logo from './assets/icon.gif';
+import img_oi from './assets/oi.png';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 const DEFAULT_WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws";
 
 const initialMessages = [
-  { id: 1, author: "Alice", color: "purple", text: "Olá pessoal! Como todos estão?", time: "14:32" },
-  { id: 2, author: "Douglas", color: "violet", own: true, text: "Tudo ótimo por aqui! Trabalhando em um novo projeto.", time: "14:33" },
-  { id: 3, author: "Bruno", color: "blue", text: "Que legal! Pode compartilhar mais detalhes?", time: "14:34" },
-  { id: 4, author: "Carol", color: "pink", text: "Alguém já viu a documentação nova do WebSocket?", time: "14:35" },
-  { id: 5, author: "Lucas", color: "purple", text: "Sim, está bem completa! A integração ficou muito mais simples.", time: "14:36" },
+  { id: 1, author: "Ag", color: "purple", text: "muehehehehe", time: "99:99" },
 ];
 
 const colors = ["purple", "violet", "blue", "pink"];
+
+function Icon() {
+  return <img src={logo} alt="Icon" style={{ maxWidth: '50px' }} />;
+}
 
 function App() {
   const [username, setUsername] = useState("");
@@ -32,6 +35,9 @@ function App() {
   const wsRef = useRef(null);
   const bottomRef = useRef(null);
 
+  const [mostrarPicker, setMostrarPicker] = useState(false);
+  const [mensagem, setMensagem] = useState('');
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -39,6 +45,12 @@ function App() {
   useEffect(() => {
     return () => wsRef.current?.close();
   }, []);
+
+  const aoClicarNoEmoji = (emojiData) => {
+    setText((prev) => prev + emojiData.emoji);
+    // Opcional: descomente a linha abaixo se quiser fechar o seletor após clicar
+    setMostrarPicker(false); 
+  };
 
   const connectWebSocket = (name) => {
     return new Promise((resolve, reject) => {
@@ -149,6 +161,7 @@ function App() {
   const disconnect = () => {
     wsRef.current?.close();
     wsRef.current = null;
+    setShowConnection(false);
     setConnected(false);
     setLoggedIn(false);
     setOnlineUsers([]);
@@ -184,23 +197,23 @@ function App() {
       <div className="login-page">
         <div className="login-card">
           <div className="login-brand">
-            <div className="brand-icon"><Zap size={26} fill="currentColor" /></div>
-            <span>NovaChat</span>
+            <div className="brand-icon">{Icon()}</div>
+            <span>TsgChat</span>
           </div>
 
           <div className="login-heading">
-            <h1>Bem-vindo ao chat</h1>
-            <p>Digite seu nome para conectar ao servidor</p>
+            <h1>OIIIIII</h1>
+            <p>Digita seu nick ai em baixo :)</p>
           </div>
 
           <form onSubmit={(event) => { event.preventDefault(); login(); }}>
-            <label htmlFor="username">SEU NOME</label>
+            <label htmlFor="username">SEU NICK</label>
             <input
               id="username"
               className="login-input"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              placeholder="Ex: Douglas"
+              placeholder="Ex: Abacate"
               autoFocus
             />
 
@@ -210,16 +223,16 @@ function App() {
               disabled={!username.trim() || connecting}
             >
               {connecting ? "Conectando..." : "Entrar no chat"}
-              {!connecting && <Send size={18} />}
+              {!connecting && <img src={img_oi} alt="Icon" style={{ maxWidth: '25px' }}/>}
             </button>
           </form>
 
           {loginError && <div className="login-error">{loginError}</div>}
-
+          {/*
           <div className="login-note">
             <span className="status-dot" />
             Sem autenticação por enquanto
-          </div>
+          </div>*/}
         </div>
       </div>
     );
@@ -229,8 +242,8 @@ function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-icon"><Zap size={23} fill="currentColor" /></div>
-          <span>NovaChat</span>
+          <div className="brand-icon">{Icon()}</div>
+          <span>TSG</span>
         </div>
 
         <section className="side-section">
@@ -247,10 +260,9 @@ function App() {
         <section className="side-section channels">
           <div className="section-heading">
             <span className="section-label">CANAIS</span>
-            <button className="icon-button small"><Plus size={19} /></button>
           </div>
 
-          {["geral", "desenvolvimento", "random", "suporte"].map((channel, index) => (
+          {["geral", "flood", "fofocas", "sem-contexto"].map((channel, index) => (
             <button className={`channel ${index === 0 ? "active" : ""}`} key={channel}>
               <Hash size={20} />
               <span>{channel}</span>
@@ -314,7 +326,10 @@ function App() {
               onKeyDown={onKeyDown}
               placeholder="Digite sua mensagem..."
             />
-            <button className="composer-icon"><Smile size={23} /></button>
+            {/* O SEU BOTÃO: Agora com evento de clique para abrir o seletor */}
+            <button 
+              className="composer-icon" onClick={() => setMostrarPicker(!mostrarPicker)} type="button"><Smile size={23} />
+            </button>
           </div>
 
           <button className="send-button" onClick={sendMessage} aria-label="Enviar">
@@ -323,24 +338,31 @@ function App() {
         </div>
       </main>
 
+      {/* Janela flutuante dos emojis posicionada de forma absoluta */}
+      {mostrarPicker && (
+        <div style={{ position: 'absolute', bottom: '50px', right: '0', zIndex: 1000 }}>
+          <EmojiPicker theme={Theme.DARK} onEmojiClick={aoClicarNoEmoji} />
+        </div>
+      )}
+
       {showConnection && (
         <div className="modal-backdrop" onMouseDown={() => setShowConnection(false)}>
           <div className="connection-modal" onMouseDown={(e) => e.stopPropagation()}>
             <div className="modal-title">
               <div>
-                <h2>WebSocket</h2>
-                <p>Configure a conexão com seu servidor</p>
+                <h2>Perfil</h2>
+                <p>Configure seu perfil</p>
               </div>
               <button className="icon-button" onClick={() => setShowConnection(false)}><X /></button>
             </div>
-
+          {/*}
             <label>ENDEREÇO DO SERVIDOR</label>
             <input
               className="ws-input"
               value={wsUrl}
               onChange={(e) => setWsUrl(e.target.value)}
               placeholder="ws://localhost:8080/ws"
-            />
+            />*/}
 
             <div className="modal-status">
               {connected ? <Wifi size={18} /> : <WifiOff size={18} />}
@@ -349,7 +371,7 @@ function App() {
 
             <div className="modal-actions">
               <button className="secondary-button" onClick={disconnect}>Desconectar</button>
-              <button
+              {/*<button
                 className="primary-button"
                 onClick={() => {
                   if (connected) {
@@ -361,7 +383,7 @@ function App() {
                 }}
               >
                 Conectar
-              </button>
+              </button>*/}
             </div>
           </div>
         </div>
