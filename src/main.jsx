@@ -285,8 +285,10 @@ function App() {
         <section className="side-section online-users">
           <div className="section-label">USUÁRIOS ONLINE</div>
 
+          <div className="online-users-list">
           {(onlineUsers.length ? onlineUsers : [username]).map((user, index) => {
             const name = typeof user === "string" ? user : user.username;
+
             return (
               <div className="user-row" key={`${name}-${index}`}>
                 <Avatar name={name} color={name === username ? "violet" : colors[index % colors.length]} />
@@ -295,6 +297,7 @@ function App() {
               </div>
             );
           })}
+          </div>
         </section>
 
         <div className="profile">
