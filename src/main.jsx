@@ -53,8 +53,15 @@ function App() {
   };
 
   const connectWebSocket = (name) => {
+
+    console.log("CONNECT WEBSOCKET CHAMADO");
+    console.log("VITE_WS_URL:", import.meta.env.VITE_WS_URL);
+    console.log("wsUrl:", wsUrl);
+
     return new Promise((resolve, reject) => {
       let settled = false;
+      
+
       const socket = new WebSocket(wsUrl);
 
       wsRef.current = socket;
@@ -142,7 +149,12 @@ function App() {
   };
 
   const login = async () => {
+    console.log("LOGIN CHAMADO");
+
     const name = username.trim();
+
+    console.log("name:", name);
+    console.log("connecting:", connecting);
 
     if (!name || connecting) return;
 
