@@ -47,7 +47,9 @@ export default function RegisterScreen({ verification, onGoToLogin, onRegistered
 
   const verifyEmail = async (event) => {
     event.preventDefault();
-    if (!/^\d{Valid.EMAIL_VERIFICATION_CODE_LENGTH}$/.test(code)) return setError("Digite o código de "+Valid.EMAIL_VERIFICATION_CODE_LENGTH+" dígitos.");
+    if (code.length !== Valid.EMAIL_VERIFICATION_CODE_LENGTH || !/^\d+$/.test(code)) {
+      return setError(`Digite o código de ${Valid.EMAIL_VERIFICATION_CODE_LENGTH} dígitos.`);
+    }
 
     setError("");
     setSubmitting(true);
