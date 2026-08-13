@@ -353,6 +353,12 @@ button { border: 0; cursor: pointer; }
   box-shadow: 0 0 0 3px rgba(117, 65, 184, .12);
 }
 .login-input::placeholder { color: #625d6e; }
+.verification-code {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .35em;
+}
 .login-card label:not(:first-child) { margin-top: 16px; }
 
 .login-button {

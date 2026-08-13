@@ -1,0 +1,3 @@
+export const USERNAME_MIN_LENGTH = 2;
+export const PASSWORD_MIN_LENGTH = 5;
+export const EMAIL_VERIFICATION_CODE_LENGTH = 6;

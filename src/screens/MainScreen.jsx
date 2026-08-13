@@ -79,31 +79,132 @@ export default function MainScreen({ username, socket, onLogout }) {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand"><div className="brand-icon"><img src={logo} alt="TsgChat" /></div><span>TSG</span></div>
+        <div className="brand">
+          <div className="brand-icon">
+            <img src={logo} alt="TsgChat" />
+          </div>
+          <span>TSG</span>
+        </div>
         <section className="side-section">
           <div className="section-label">CONEXÃO</div>
-          <button className={`connection-status ${connected ? "online" : "offline"}`} onClick={() => setShowConnection(true)}><span className="status-dot" />{connected ? "Conectado" : "Desconectado"}</button>
+          <button className={`connection-status ${connected ? "online" : "offline"}`} onClick={() => setShowConnection(true)}>
+            <span className="status-dot" />
+            {connected ? "Conectado" : "Desconectado"}
+          </button>
         </section>
         <section className="side-section channels">
-          <div className="section-heading"><span className="section-label">CANAIS</span></div>
-          {["geral", "flood", "fofocas", "sem-contexto"].map((channel, index) => <button className={`channel ${index === 0 ? "active" : ""}`} key={channel}><Hash size={20} /><span>{channel}</span></button>)}
+          <div className="section-heading">
+            <span className="section-label">CANAIS</span>
+          </div>
+          {["geral", "flood", "fofocas", "sem-contexto"].map((channel, index) =>
+            <button className={`channel ${index === 0 ? "active" : ""}`}
+              key={channel}>
+              <Hash size={20} />
+              <span>{channel}
+              </span>
+            </button>)}
         </section>
         <section className="side-section online-users">
           <div className="section-label">USUÁRIOS ONLINE</div>
-          <div className="online-users-list">{(onlineUsers.length ? onlineUsers : [username]).map((user, index) => {
+          <div className="online-users-list">
+            {(onlineUsers.length ? onlineUsers : [username]).map((user, index) => {
             const name = typeof user === "string" ? user : user.username;
-            return <div className="user-row" key={`${name}-${index}`}><Avatar name={name} color={name === username ? "violet" : colors[index % colors.length]} /><span>{name}</span>{name === username && <span className="crown">Você</span>}</div>;
+            return <div className="user-row" key={`${name}-${index}`}>
+              <Avatar name={name}
+                color={name === username ? "violet" : colors[index % colors.length]} />
+              <span>{name}</span>
+              {name === username &&
+                <span className="crown">
+                  Você
+                </span>}
+            </div>;
           })}</div>
         </section>
-        <div className="profile"><Avatar name={username} color="violet" /><div className="profile-info"><strong>{username}</strong><span><i /> Online</span></div><button className="icon-button" onClick={() => setShowConnection(true)} aria-label="Abrir perfil"><Settings size={19} /></button></div>
+        <div className="profile">
+          <Avatar name={username} color="violet" />
+          <div className="profile-info">
+            <strong>{username}</strong>
+            <span><i /> Online</span>
+          </div>
+          <button className="icon-button"
+            onClick={() => setShowConnection(true)}
+            aria-label="Abrir perfil">
+            <Settings size={19} />
+          </button>
+        </div>
       </aside>
       <main className="chat">
-        <header className="chat-header"><div><div className="channel-title"><Hash size={28} /><h1>geral</h1></div><p>Chat geral para todos os membros.</p></div><div className="header-actions"><div className="member-count"><Users size={20} /> {onlineUsers.length} online</div><button className="icon-button" aria-label="Mais opções"><MoreVertical /></button></div></header>
-        <div className="messages">{messages.map((message) => <Message key={message.id} message={message} />)}<div ref={bottomRef} /></div>
-        <div className="composer-wrap"><div className="composer"><button className="composer-icon" aria-label="Anexar arquivo"><Paperclip size={23} /></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Digite sua mensagem..." /><button className="composer-icon" onClick={() => setShowEmojiPicker((value) => !value)} aria-label="Escolher emoji"><Smile size={23} /></button></div><button className="send-button" onClick={sendMessage} aria-label="Enviar"><Send size={22} /></button></div>
+        <header className="chat-header">
+          <div>
+            <div className="channel-title">
+              <Hash size={28} />
+              <h1>geral</h1>
+            </div>
+            <p>Feijão com farinha</p>
+          </div>
+          <div className="header-actions">
+            <div className="member-count">
+              <Users size={20} />
+              {onlineUsers.length} online
+            </div>
+            <button className="icon-button" aria-label="Mais opções">
+              <MoreVertical />
+            </button>
+          </div>
+        </header>
+        <div className="messages">
+          {messages.map((message) => <Message key={message.id} message={message} />)}
+          <div ref={bottomRef} /></div>
+        <div className="composer-wrap">
+          <div className="composer">
+            <button className="composer-icon" aria-label="Anexar arquivo">
+              <Paperclip size={23} />
+            </button>
+            <input value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              placeholder="Digite sua mensagem..." />
+            <button className="composer-icon"
+              onClick={() => setShowEmojiPicker((value) => !value)}
+              aria-label="Escolher emoji">
+              <Smile size={23} />
+            </button>
+          </div>
+          <button className="send-button" onClick={sendMessage} aria-label="Enviar">
+            <Send size={22} />
+          </button></div>
       </main>
-      {showEmojiPicker && <div className="emoji-picker"><EmojiPicker theme={Theme.DARK} onEmojiClick={(emoji) => { setText((value) => value + emoji.emoji); setShowEmojiPicker(false); }} /></div>}
-      {showConnection && <div className="modal-backdrop" onMouseDown={() => setShowConnection(false)}><div className="connection-modal" onMouseDown={(e) => e.stopPropagation()}><div className="modal-title"><div><h2>Perfil</h2><p>Configure seu perfil</p></div><button className="icon-button" onClick={() => setShowConnection(false)} aria-label="Fechar"><X /></button></div><div className="modal-status"><Wifi size={18} /><span>Conexão ativa</span></div><div className="modal-actions"><button className="secondary-button" onClick={disconnect}>Desconectar</button></div></div></div>}
+      {showEmojiPicker &&
+        <div className="emoji-picker">
+          <EmojiPicker theme={Theme.DARK}
+            onEmojiClick={(emoji) => {
+              setText((value) => value + emoji.emoji);
+              setShowEmojiPicker(false);
+            }} />
+        </div>}
+      {showConnection &&
+        <div className="modal-backdrop" onMouseDown={() =>
+          setShowConnection(false)}>
+          <div className="connection-modal"
+            onMouseDown={(e) => e.stopPropagation()}>
+            <div className="modal-title">
+              <div>
+                <h2>Perfil</h2>
+                <p>Configure seu perfil</p>
+              </div>
+              <button className="icon-button" onClick={() => setShowConnection(false)} aria-label="Fechar">
+                <X />
+              </button>
+            </div>
+            <div className="modal-status">
+              <Wifi size={18} />
+              <span>Conexão ativa</span>
+            </div>
+            <div className="modal-actions">
+              <button className="secondary-button" onClick={disconnect}>Desconectar</button>
+            </div>
+          </div>
+        </div>}
     </div>
   );
 }

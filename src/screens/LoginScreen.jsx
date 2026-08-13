@@ -3,7 +3,9 @@ import Brand from "../components/Brand";
 import { WS_URL } from "../config";
 import imgOi from "../assets/oi.png";
 
-export default function LoginScreen({ initialUsername, onGoToRegister, onLogin }) {
+import * as Valid from "../constants/validation"
+
+export default function LoginScreen({ initialUsername, onGoToRegister, onVerificationRequired, onLogin }) {
   const [username, setUsername] = useState(initialUsername);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,12 +15,12 @@ export default function LoginScreen({ initialUsername, onGoToRegister, onLogin }
     event.preventDefault();
     const name = username.trim();
 
-    if (name.length < 3) {
-      setError("O usuário deve ter no mínimo 3 caracteres.");
+    if (name.length < Valid.USERNAME_MIN_LENGTH) {
+      setError("O usuário deve ter no mínimo "+Valid.USERNAME_MIN_LENGTH+" caracteres.");
       return;
     }
-    if (password.length < 6) {
-      setError("A senha deve ter no mínimo 6 caracteres.");
+    if (password.length < Valid.PASSWORD_MIN_LENGTH) {
+      setError("A senha deve ter no mínimo "+Valid.PASSWORD_MIN_LENGTH+" caracteres.");
       return;
     }
 
@@ -47,6 +49,12 @@ export default function LoginScreen({ initialUsername, onGoToRegister, onLogin }
         socket.onerror = null;
         socket.onclose = null;
         onLogin(name, socket);
+      } else if (data.type === "email_verification_required") {
+        setConnecting(false);
+        socket.onerror = null;
+        socket.onclose = null;
+        socket.close();
+        onVerificationRequired(name, data.email);
       } else if (data.type === "error") {
         setError(data.text || "Não foi possível entrar.");
         setConnecting(false);
@@ -68,20 +76,44 @@ export default function LoginScreen({ initialUsername, onGoToRegister, onLogin }
         <Brand />
         <div className="login-heading">
           <h1>OIIIIII</h1>
-          <p>Entre com seu usuário e sua senha :)</p>
+          <p>Entra ai :)</p>
         </div>
         <form onSubmit={submit}>
           <label htmlFor="login-username">SEU USUÁRIO</label>
-          <input id="login-username" className="login-input" value={username} onChange={(e) => setUsername(e.target.value)} minLength={3} placeholder="Ex: Abacate" autoComplete="username" autoFocus required />
+          <input
+            id="login-username"
+            className="login-input"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            minLength={Valid.USERNAME_MIN_LENGTH}
+            placeholder="Ex: ADEPTO"
+            autoComplete="username"
+            autoFocus required />
           <label htmlFor="login-password">SENHA</label>
-          <input id="login-password" className="login-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} placeholder="Sua senha" autoComplete="current-password" required />
-          <button className="login-button" type="submit" disabled={connecting}>
+          <input
+            id="login-password"
+            className="login-input"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={Valid.PASSWORD_MIN_LENGTH}
+            placeholder="Sua senha muito foda"
+            autoComplete="current-password" required />
+          <button
+            className="login-button"
+            type="submit"
+            disabled={connecting}>
             {connecting ? "Conectando..." : "Entrar no chat"}
             {!connecting && <img src={imgOi} alt="" />}
           </button>
         </form>
         {error && <div className="login-error" role="alert">{error}</div>}
-        <p className="auth-switch">Ainda não tem uma conta? <button type="button" onClick={onGoToRegister}>Cadastre-se</button></p>
+        <p className="auth-switch">
+          Nao fez conta ainda bobão?
+          <button type="button" onClick={onGoToRegister}>
+            Cadastra ai
+          </button>
+        </p>
       </div>
     </div>
   );

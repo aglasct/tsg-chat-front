@@ -6,6 +6,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 export default function App() {
   const [screen, setScreen] = useState("login");
   const [session, setSession] = useState(null);
+  const [pendingVerification, setPendingVerification] = useState(null);
   const logout = useCallback(() => {
     setSession(null);
     setScreen("login");
@@ -14,8 +15,13 @@ export default function App() {
   if (screen === "register") {
     return (
       <RegisterScreen
-        onGoToLogin={() => setScreen("login")}
+        verification={pendingVerification}
+        onGoToLogin={() => {
+          setPendingVerification(null);
+          setScreen("login");
+        }}
         onRegistered={(username) => {
+		  setPendingVerification(null);
           setSession({ username });
           setScreen("login");
         }}
@@ -36,7 +42,14 @@ export default function App() {
   return (
     <LoginScreen
       initialUsername={session?.username || ""}
-      onGoToRegister={() => setScreen("register")}
+      onGoToRegister={() => {
+        setPendingVerification(null);
+        setScreen("register");
+      }}
+      onVerificationRequired={(username, email) => {
+        setPendingVerification({ username, email });
+        setScreen("register");
+      }}
       onLogin={(username, socket) => {
         setSession({ username, socket });
         setScreen("main");
